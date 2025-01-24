@@ -1,0 +1,92 @@
+/*
+  AT28C256 EEPROM Progammer using 3 74595 shift registers.
+  Dylan Butler January 2025
+*/  
+
+
+#define latch 4        
+#define serial_data 2   //address shift register pins
+#define clock 5
+
+#define data_latch 18
+#define data_serial_data 19    //eeprom data pins
+#define data_clock 21
+
+#define write_enable 1 //EEPROM programming pins
+#define output_enable 3
+
+ //array of addresses in the EEPROM
+byte data[] = {}; //data to be programmed to the EEPROM
+
+
+
+void EEPROM_write(byte data_bytes[]){
+
+for (int i = 0; i < sizeof(data_bytes) / sizeof(data_bytes[0]); i++){
+
+  digitalWrite(latch, LOW);
+
+  shiftOut(serial_data, clock, LSBFIRST, lowByte(i));
+  shiftOut(serial_data, clock, LSBFIRST, highByte(i));
+
+  digitalWrite(latch, HIGH);
+  digitalWrite(latch, LOW);
+
+  digitalWrite(data_latch, LOW);
+
+  shiftOut(data_serial_data, data_clock, LSBFIRST, data_bytes[i]);
+
+  digitalWrite(data_latch, HIGH);
+  digitalWrite(data_latch, LOW);
+
+  digitalWrite(write_enable, LOW);
+  delayMicroseconds(1);
+  digitalWrite(write_enable, HIGH);
+
+}
+
+
+}
+
+
+void EEPROM_erase(){
+  byte erase[32768];
+for(int i = 0; i <= 32768; i++){
+  erase[i] = 0xFF;
+}
+  EEPROM_write(erase);
+  Serial.print("!!Erasing complete!!");
+}
+
+void user_input(){
+
+  
+}
+
+
+
+void setup(){
+Serial.begin(9600);
+
+pinMode(latch, OUTPUT);
+pinMode(serial_data, OUTPUT);
+pinMode(clock, OUTPUT);
+
+pinMode(data_latch, OUTPUT);
+pinMode(data_serial_data, OUTPUT);
+pinMode(data_clock, OUTPUT);
+
+pinMode(write_enable, OUTPUT);
+pinMode(output_enable, OUTPUT);
+
+digitalWrite(write_enable, HIGH);
+digitalWrite(output_enable, HIGH);
+
+digitalWrite(data_latch, LOW);
+digitalWrite(latch, LOW);
+
+}
+
+void loop(){
+
+}
